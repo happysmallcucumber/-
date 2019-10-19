@@ -1,0 +1,135 @@
+#include"iostream"
+#include <iomanip>
+using namespace std;
+
+float Countoptimal(float D[], float P[], int Start, int End, float B, float C,float RemainOil)
+{
+	float MaxDistance = B * C;
+	float sum = 0;
+	int Cheapest;
+
+	if (D[End] - D[Start] > MaxDistance)
+	{
+		Cheapest = Start;
+		for (int i = Start; i < End - 1; i++)
+		{
+			if (P[i + 1] < P[Cheapest]) Cheapest = i + 1;
+		}
+
+		if (Cheapest == Start)
+		{
+			int temp;
+			sum = (C - RemainOil) * P[Start];
+			RemainOil = C;
+			for (int i = Start + 1; (D[i] - D[Start]) < MaxDistance; i++)
+			{
+				temp = i;
+				if (P[i] < P[temp]) temp = i;
+			}
+			RemainOil = RemainOil - (D[temp] - D[Start]) / B;
+			Start = temp;
+			sum += Countoptimal(D, P, Start, End, B, C, RemainOil);
+		}
+
+		else
+		{
+			if (D[Cheapest] - D[Start] < MaxDistance)
+			{
+				if ((D[Cheapest] - D[Start]) < B*RemainOil)
+				{
+					RemainOil = RemainOil - (D[End] - D[Start]) / B;
+					Start = Cheapest;
+					sum += Countoptimal(D, P, Start, End, B, C, RemainOil);
+				}
+				else
+				{
+					sum = ((D[Cheapest] - D[Start]) / B - RemainOil)*P[Start];
+					RemainOil = 0;
+					Start = Cheapest;
+					sum+= Countoptimal(D, P, Start, End, B, C, RemainOil);
+				}
+			}
+			else
+			{
+				End = Cheapest;
+				sum += Countoptimal(D, P, Start, End, B, C,RemainOil);
+			}
+		}
+	}
+	
+	else
+	{
+		Cheapest = Start;
+		for (int i = Start; i < End - 1; i++)
+		{
+			if (P[i + 1] < P[Cheapest]) Cheapest = i + 1;
+		}
+
+		if (Cheapest == Start)
+		{
+			sum = ((D[End] - D[Start]) / B - RemainOil)*P[Start];
+		}
+		else
+		{
+			if ((D[Cheapest] - D[Start]) < B*RemainOil)
+			{
+				RemainOil = RemainOil - (D[End] - D[Start]) / B;
+				Start = Cheapest;
+				sum += Countoptimal(D,P,Start,End,B,C,RemainOil);
+			}
+			else
+			{
+				sum = (((D[Cheapest] - D[Start]) / B) - RemainOil)*P[Start];
+				RemainOil = 0;
+				Start = Cheapest;
+				sum += Countoptimal(D, P, Start, End, B, C, RemainOil);
+			}
+		}
+	}
+	return sum;
+
+}
+
+
+
+
+
+float CountMinCost(float A, float C, float B, float P, int N)
+{
+	float MaxDistance = B * C;
+	float MinCost = 0;
+	float Gas = 0;
+	int Console = 1;
+	int i=0;
+	int j = 0;
+	int k = 0;
+	int m = 0;
+	float D[9999];         //创建加油站之间的距离
+	float p[9999];         //创建每个加油站的汽油价格
+
+	D[0] = 0;
+	D[N + 1] = A;
+	p[0] = P;
+	p[N + 1] = 9999;
+	cout << "请输入" << N << "个加油站到出发的距离和这个油站的油价:" << endl;
+	for (i = 1; i < N+1; i++)
+	{
+		cout << "请输入第" << i << "个加油站到出发点的距离和这个油站的油格：";
+		cin >> D[i] >> p[i];
+	}
+
+
+	for (i = 0; i < N +1; i++)
+	{
+		if ((D[i + 1] - D[i]) > MaxDistance) Console = 0;
+	}
+
+
+	if (Console == 0) cout << "No Console" << endl;
+
+	else
+	{
+		cout<<Countoptimal(D, p, 0, N + 1, B, C, 0);
+	}
+	return 0;
+}
