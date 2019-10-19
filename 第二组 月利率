@@ -1,0 +1,49 @@
+#include"iostream"
+#include <iomanip>
+using namespace std;
+
+
+double ProgressionSum(int Capital , int MoneyMoon,float x, int n)
+{
+	double sum = Capital;
+	for (int i = 0; i <n; i++)
+	{
+		sum += Capital * x;
+		Capital+= Capital*x - MoneyMoon;
+	}
+	return sum;
+}
+
+
+
+float InterestRate()
+{
+	int Capital;
+	int MoneyMoon, Moon;
+	float min = 0, max = 1;
+	float middle = (min + max) / 2;
+	float Error = 1;
+	cout << "请依次输入您的本金，每月还款金额，还款月份：";
+	cin >> Capital >> MoneyMoon >> Moon;
+	float Rate = MoneyMoon * Moon;
+    float progressionsum = ProgressionSum(Capital,MoneyMoon,middle, Moon);
+
+
+
+	while((progressionsum - Rate>Error) || (Rate-progressionsum>Error))
+	{
+		if (progressionsum - Rate< 0)
+		{
+			min = middle;
+			middle = (min + max) / 2;
+		}
+		else 
+		{
+			max = middle;
+			middle= (min + max) / 2;
+		}
+		progressionsum = ProgressionSum(Capital,MoneyMoon,middle, Moon);
+	}
+	cout << "您的月利率为:"<<fixed << setprecision(1) << middle * 100<<"%";
+	return 0;
+}
